@@ -16,7 +16,11 @@ python-dotenv = "^1.0.0"
 aiostream = "^0.5.2"
 llama-index = "0.10.28"
 llama-index-core = "0.10.28"
+llama-index-llms-azure-openai = "0.1.7"
+llama-index-tools-azure-code-interpreter = "0.1.1"
+llama-index-embeddings-azure-openai = "0.1.9"
 cachetools = "^5.3.3"
+azure-identity = "1.16.0"
 
 [tool.poetry.dependencies.uvicorn]
 extras = [ "standard" ]

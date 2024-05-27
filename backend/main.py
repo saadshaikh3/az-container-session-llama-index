@@ -12,7 +12,7 @@ from app.api.routers.chat import chat_router
 from app.settings import init_settings
 from app.observability import init_observability
 from fastapi.staticfiles import StaticFiles
-
+from azure.identity import DefaultAzureCredential
 
 app = FastAPI()
 
@@ -31,7 +31,7 @@ if environment == "dev":
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
+    credential = DefaultAzureCredential()
     # Redirect to documentation page when accessing base URL
     @app.get("/")
     async def redirect_to_docs():

@@ -39,6 +39,7 @@ function ChatMessageContent({
   message: Message;
   isLoading: boolean;
 }) {
+  console.log("chatMessage",message)
   const annotations = message.annotations as MessageAnnotation[] | undefined;
   if (!annotations?.length) return <Markdown content={message.content} />;
 

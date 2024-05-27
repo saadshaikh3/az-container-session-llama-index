@@ -7,6 +7,8 @@ def init_settings():
     model_provider = os.getenv("MODEL_PROVIDER")
     if model_provider == "openai":
         init_openai()
+    elif model_provider == "azure_openai":
+        init_azureopenai()
     elif model_provider == "ollama":
         init_ollama()
     elif model_provider == "anthropic":
@@ -51,6 +53,36 @@ def init_openai():
     }
     Settings.embed_model = OpenAIEmbedding(**config)
 
+def init_azureopenai():
+    from llama_index.llms.azure_openai import AzureOpenAI
+    from llama_index.core.constants import DEFAULT_TEMPERATURE
+    from llama_index.embeddings.azure_openai import AzureOpenAIEmbedding
+
+    AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+    AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+    max_tokens = os.getenv("LLM_MAX_TOKENS")
+    model = os.getenv("MODEL")
+
+    Settings.llm = AzureOpenAI(
+        model="gpt-4o",
+        deployment_name = model,
+        api_key=AZURE_OPENAI_API_KEY,
+        azure_endpoint=AZURE_OPENAI_ENDPOINT,
+        api_version="2024-02-01",
+        max_tokens = int(max_tokens) if max_tokens is not None else None,
+        temperature=float(os.getenv("LLM_TEMPERATURE", DEFAULT_TEMPERATURE)),
+        stream = True
+    )
+
+    embed_model= os.getenv("EMBEDDING_MODEL")
+
+    Settings.embed_model = AzureOpenAIEmbedding(
+    model="text-embedding-ada-002",
+    deployment_name=embed_model,
+    api_key=AZURE_OPENAI_API_KEY,
+    azure_endpoint=AZURE_OPENAI_ENDPOINT,
+    api_version="2024-02-01",
+    )
 
 def init_anthropic():
     from llama_index.llms.anthropic import Anthropic

@@ -1,16 +1,17 @@
+import os
 from pydantic import BaseModel
 from typing import List, Any, Optional, Dict, Tuple
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from llama_index.core.chat_engine.types import BaseChatEngine
 from llama_index.core.schema import NodeWithScore
 from llama_index.core.llms import ChatMessage, MessageRole
-from app.engine import get_chat_engine
+from app.engine import get_az_interpreter_chat_engine, get_chat_engine
 from app.api.routers.vercel_response import VercelStreamResponse
 from app.api.routers.messaging import EventCallbackHandler
 from aiostream import stream
 
-chat_router = r = APIRouter()
 
+chat_router = r = APIRouter()
 
 class _Message(BaseModel):
     role: MessageRole
@@ -87,13 +88,22 @@ async def parse_chat_data(data: _ChatData) -> Tuple[str, List[ChatMessage]]:
 async def chat(
     request: Request,
     data: _ChatData,
-    chat_engine: BaseChatEngine = Depends(get_chat_engine),
+    # chat_engine: BaseChatEngine = Depends(get_az_interpreter_chat_engine)
 ):
+    DATASET_PATH = os.getenv("DATASET_PATH")
+    
     last_message_content, messages = await parse_chat_data(data)
-
+    chat_engine, code_interpret_client = get_az_interpreter_chat_engine()
     event_handler = EventCallbackHandler()
     chat_engine.callback_manager.handlers.append(event_handler)  # type: ignore
+
     response = await chat_engine.astream_chat(last_message_content, messages)
+    
+    # Download the modified file
+    code_interpret_client.download_file_to_local(
+        remote_file_path=os.path.basename(DATASET_PATH),
+        local_file_path=DATASET_PATH,
+    )
 
     async def content_generator():
         # Yield the text response
