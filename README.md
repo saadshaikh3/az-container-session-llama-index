@@ -8,6 +8,10 @@ Second, run the development server of the frontend as described in the [frontend
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+You may need to run _az login_ before starting your backend in order to get authorized with your azure container session pool. 
+
+Make sure you assign yourself the _Contributor_ and _Session Pool Executor_ RBAC roles on Azure IAM first.
+
 ## Learn More
 
 To learn more about LlamaIndex, take a look at the following resources:
